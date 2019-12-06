@@ -1,6 +1,12 @@
 ## Chat App Test
 
 Esta aplicacicion basica de chat fue desarrollada con Node.js, Socket.io, Vue y HTML5.
+Sus funcionalidades son:
+1. Ingresar como un usuario con nombre.
+2. Ver cantidad de conexiones disponibles (otros usuarios conectados).
+3. Poder enviar/recibir mensajes con mas de una persona, es decir chat grupal.
+4. Notificar cuando un usuario haya ingresado/abandonado la conversacion.
+5. Visualizar/notificar cuando un usuario este escribiendo un mensaje.
 
 ### Pasos para ejecutar la aplicacion
 
