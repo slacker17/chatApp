@@ -1,4 +1,4 @@
-## chatApp Test
+## Chat App Test
 
 Esta aplicacicion basica de chat fue desarrollada con Node.js, Socket.io, Vue y HTML5.
 
