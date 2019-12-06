@@ -21,6 +21,6 @@ cd chatApp
 ```
 node server.js
 ```
-4. Nos dirijimos al navegador y  accedemos a la direccion: http://localhost:3000
+4. Nos dirigimos al navegador y  accedemos a la direccion: http://localhost:3000
 
 5. Podemos comenzar a usar la app.
