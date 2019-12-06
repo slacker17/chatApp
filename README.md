@@ -24,3 +24,18 @@ node server.js
 4. Nos dirigimos al navegador y  accedemos a la direccion: http://localhost:3000
 
 5. Podemos comenzar a usar la app.
+
+### Estructura del proyecto
+
+A continuación se presentan los principales archivos/directorios de la aplicación:
+
+```
+chatApp
+  |__css            <-- Carpeta de estilos css
+  |__js             <-- Carpeta de scripts js
+  |__scss           <-- Carpeta de estilos scss
+  |__node_modules   <-- Carpeta de los modulos de Node.js
+  |__index.html     <-- Vista principal de la app
+  |__server.js      <-- Archivo de ejecucion principal JavaScript(Node), en el cual se ejecuta la app
+  |__package.json   <-- Propiedades del proyecto
+  ```
