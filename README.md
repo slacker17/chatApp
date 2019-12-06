@@ -10,7 +10,17 @@ Esta aplicacicion basica de chat fue desarrollada con Node.js, Socket.io, Vue y 
 >npm: https://www.npmjs.com/get-npm
 
 1. Descargar o clonar este proyecto, para la linea de comandos seria:
-
 ```
 git clone https://github.com/slacker17/chatApp
 ```
+2. Nos posicionamos en la carpeta del proyecto:
+```
+cd chatApp
+```
+3. Ejecutamos la aplicacion con el siguiente comando:
+```
+node server.js
+```
+4. Nos dirijimos al navegador y  accedemos a la direccion: http://localhost:3000
+
+5. Podemos comenzar a usar la app.
