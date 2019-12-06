@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat Test</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link rel="stylesheet" href="css/normalize.css">
+
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+    <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.min.css'>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="app" class="chat">
+
+            <div class="col-lg-6 offset-lg-3">
+                <div v-if="ready">
+                      <p v-for="user in info" class="alert alert-warning" role="alert">
+                            {{user.username}} {{user.type}}
+                      </p>
+                </div>
+
+                <div v-if="!ready">
+                    <h4>Ingresa tu nombre</h4>
+                    <form @submit.prevent="addUser">
+                        <div class="form-group row">
+                            <input type="text" class="form-control col-9" v-model="username"
+                                placeholder="">
+                            <input type="submit" value="Entrar" class="btn btn-sm btn-dark ml-1">
+                        </div>
+                    </form>
+                </div>
+                <h2 v-else>Bienvenido(a) {{username}}</h2>
+                <div class="card bg-dark" v-if="ready">
+                    <div class="card-header text-white">
+                    </div>
+                    <h4 class="text-white">Chat <span class="float-right text-white">{{connections}} conectados</span></h4>
+                    <ul class="list-group list-group-flush text-right">
+                        <small v-if="typing" class="text-white">{{typing}} esta escribiendo</small>
+                        <li class="list-group-item" v-for="message in messages">
+
+                            <span :class="{'float-left':message.type === 1}">
+                                <small><strong>{{message.user}}:</strong></small>
+                                {{message.message}}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <div class="card-body">
+                        <form @submit.prevent="send">
+                            <div class="form-group">
+                                <input type="text" class="form-control" v-model="newMessage"
+                                    placeholder="Escribe aqui tu mensaje">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://unpkg.com/vue-toastify@0.2.1/dist/vue-toastify.umd.min.js"></script>
+
+<script>
+    // Socket.io del lado del cliente
+    var socket = io();
+
+    // Creacion de una instancia Vue
+    let vue = new Vue({
+
+        // Elemento root en la app
+        el: '#app',
+        // Declaracion de un objeto e inicializacion de propiedaes
+        data: {
+            newMessage: null,
+            messages: [],
+            typing: false,
+            username: null,
+            ready: false,
+            info: [],
+            connections: 0,
+        },
+
+        // Metodo Created Vue
+        created() {
+
+            // Emitting 'leave' event on tab closed event.
+            window.onbeforeunload = () => {
+                socket.emit('leave', this.username);
+            }
+
+            // Escuchando el evento chat-message desde el servidor y poniendolo en el array de mensajes
+            socket.on('chat-message', (data) => {
+                this.messages.push({
+                    message: data.message,
+                    type: 1,
+                    user: data.user,
+                });
+            });
+
+            // Escuchando el evento typing (escribiendo) desde el servidor y estableciendo los datos de usuario
+            socket.on('typing', (data) => {
+                this.typing = data;
+            });
+
+            // Escuchando el evento stopTyping  desde el servidor y estableciendo los datos a false (usado como bandera)
+            socket.on('stopTyping', () => {
+                this.typing = false;
+            });
+
+            // Escuchando el evento joined  desde el servidor y estableciendo los datos en el arreglo
+            socket.on('joined', (data) => {
+                this.info.push({
+                    username: data,
+                    type: 'se ha unido a la conversacion' // Mensaje de notificacion
+                });
+
+                // Tiempo en que la informacion en el array se vacie
+                setTimeout(() => {
+                    this.info = [];
+                }, 5000);
+            });
+
+            // Escuchando el evento leave emitido por el servidor y estableciendo los datos en el arreglo
+            socket.on('leave', (data) => {
+                this.info.push({
+                    username: data,
+                    type: 'ha abandonado la conversacion' // Mensaje de notificacion
+                });
+
+                // Tiempo en que la informacion en el array se vacie
+                setTimeout(() => {
+                    this.info = [];
+                }, 5000);
+            });
+
+            // Escuchando el evento connections emitido por el servidor para obetener el numero total de clientes conectados
+            socket.on('connections', (data) => {
+                this.connections = data;
+            });
+        },
+
+        // Vue Watch hook
+        watch: {
+
+            // Viendo los cambios en la caja de mensajes para emitir el typing o bicerversa
+            newMessage(value) {
+                value ? socket.emit('typing', this.username) : socket.emit('stopTyping')
+            }
+        },
+        //Vue Methods hook
+        methods: {
+
+            // MEtodo que envia los emnsajes de un usuario al servidor
+            send() {
+                // Ponemos el mensaje en la vista del usuario
+                this.messages.push({
+                    message: this.newMessage,
+                    type: 0,
+                    user: 'Yo', // Label en vista
+                });
+                // Emitimos el mensaje al servidor para que lo vean todos
+                socket.emit('chat-message', {
+                    message: this.newMessage,
+                    user: this.username
+                });
+                this.newMessage = null; // Reestablecemos variable de msj
+            },
+
+            // Emision del evento joined para notificar a los demas
+            addUser() {
+                this.ready = true;
+                socket.emit('joined', this.username)
+            }
+        },
+    });
+</script>
+
+</html>

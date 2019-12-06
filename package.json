@@ -1,0 +1,16 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "chat",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Valentin Aguila",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0",
+    "title-case": "^3.0.1"
+  }
+}
